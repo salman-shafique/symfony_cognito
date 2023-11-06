@@ -1,0 +1,24 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+
+login:
+  path: /login
+  controller: App\Controller\SecurityController::login
+  methods: [POST]
+
+register:
+  path: /register
+  controller: App\Controller\SecurityController::register
+  methods: [POST]
+
+confirmSignUp:
+  path: /confirmation
+  controller: App\Controller\SecurityController::confirmUser
+  methods: [POST]
+
+getCities:
+  path: /cities
+  controller: App\Controller\CitiesController::listCities
+  methods: [GET]

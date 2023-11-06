@@ -1,0 +1,56 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    aws.cognito.region: '%env(COGNITO_REGION)%'
+    aws.cognito.version: 'latest' # or specify your version
+    aws.access.key: '%env(AWS_ACCESS_KEY_ID)%'
+    aws.access.secret.key: '%env(AWS_SECRET_ACCESS_KEY)%'
+    aws.cognito.user_pool_id: '%env(COGNITO_USER_POOL_ID)%'
+    aws.cognito.client_id: '%env(COGNITO_CLIENT_ID)%'
+    aws.cognito.client_secrect: '%env(COGNITO_CLIENT_SECRET)%'
+
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    Aws\CognitoIdentityProvider\CognitoIdentityProviderClient:
+        arguments:
+            - region: '%aws.cognito.region%'
+              version: '%aws.cognito.version%'
+              credentials:
+                  key: '%aws.access.key%'
+                  secret: '%aws.access.secret.key%'
+        public: true  # Set this to true if you need to get the service directly from the container
+
+        # If you want to bind the Cognito client to your controller's constructor:
+    App\Controller\SecurityController:
+            arguments:
+                $cognitoClient: '@Aws\CognitoIdentityProvider\CognitoIdentityProviderClient'
+                $cognitoClientId: '%aws.cognito.client_id%'
+                $cognitoClientSecret: '%aws.cognito.client_secrect%'
+                $cognitoUserPoolId: '%aws.cognito.user_pool_id%'
+    App\Controller\CitiesController:
+            arguments:
+                $cognitoClient: '@Aws\CognitoIdentityProvider\CognitoIdentityProviderClient'
+                $cognitoClientId: '%aws.cognito.client_id%'
+                $cognitoClientSecret: '%aws.cognito.client_secrect%'
+                $cognitoUserPoolId: '%aws.cognito.user_pool_id%'
+
